@@ -1,38 +1,123 @@
-"use strict";
-const apn = require('apn');
-//var key = require("");
-let options = {
-  token: {
-     key: './APNsAuthKey_49GQKEW5EP.p8',
-     // Replace keyID and teamID with the values you've previously saved.
-     keyId: "49GQKEW5EP",
-     teamId: "WCQEEPJWL6"
-   },
-   production: false
- };
- 
-let apnProvider = new apn.Provider(options);
+var express = require('express'),
+	app = express(),
+	account = require('./key.json');
 
-// Replace deviceToken with your particular token:
-let deviceToken = "D4F2693A9D33E0D101BC3B86CB8A711713E96390D912E27E3A2F65A1F348BD2A";
+app.set('port', (process.env.PORT || 5000));
 
-// Prepare the notifications
-let notification = new apn.Notification();
-notification.expiry = Math.floor(Date.now() / 1000) + 24 * 3600; // will expire in 24 hours from now
-notification.badge = 2;
-notification.sound = "ping.aiff";
-notification.alert = "Hello from solarianprogrammer.com";
-notification.payload = {'messageFrom': 'Solarian Programmer'};
-
-// Replace this with your app bundle ID:
-notification.topic = "com.cleeq.ios";
-
-// Send the actual notification
-apnProvider.send(notification, deviceToken).then( result => {
-// Show the result of the send operation:
-console.log("RESULT: ",result);
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
 });
- 
- 
-// Close the server
-apnProvider.shutdown();
+
+var firebase = require("firebase");
+var request = require('request');
+
+// Initialize the app with a service account, granting admin privileges
+firebase.initializeApp({
+  databaseURL: process.env.DB_URL,
+  serviceAccount: account,
+});
+
+console.log("Firebase initialization passed");
+
+// As an admin, the app has access to read and write all data, regardless of Security Rules
+var db = firebase.database();
+var ref = db.ref("notifications");
+
+// This callback function is needed to detect changes in the number of attemps.
+// Note that a proper exponential backoff algorithm would work much better,
+// but just trying to send the notification 10 times is decent for testing / beta launch
+ref.orderByChild("sent").equalTo(false).on("child_changed", function(snapshot) {
+  console.log("Snapshot recieved (child_changed)");
+
+  handleNotificationSnapshot(snapshot)
+});
+
+// This callback function is needed to detect additions to notification/ in the Firebase databse
+ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
+  console.log("Snapshot recieved (child_added)");
+
+  handleNotificationSnapshot(snapshot)
+});
+
+function handleNotificationSnapshot(snapshot) {
+  if (snapshot.val() != null) {   // Make sure that the snapshot is not empty
+
+    // Log the number of send attemps
+    console.log("Number of attemps " + snapshot.val()["attempts"])
+
+    // Double check that the notification has not been sent, and that the number of attemps is less than 10
+    if (snapshot.val()["sent"] === false && snapshot.val()["attempts"] < 10) {
+
+      console.log("VAL: ",snapshot.val());
+
+      // Create a reference to the notification ids (tokens) in the Firebase database
+      var userNotificationIDRef = db.ref("notification_ids/" + snapshot.val()["username"]);
+
+      // Retrieve the notification ids
+      userNotificationIDRef.once("value", function(notificationSnapshot) {
+
+        if (notificationSnapshot.val() != null) { // Make sure that the snapshot is not empty
+
+          console.log("Notification ids recieved");
+
+          // Send the notification
+          sendNotification(notificationSnapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
+        }
+        else {
+          console.log("No notification ids registered");
+        }
+      });
+
+    }
+  }
+}
+
+// This is a function which sends notifications to multiple devices
+function sendNotification(username, message, key, attempts) {
+
+  console.log("Sending notification");
+
+  request(
+    {
+      method: 'POST',
+      uri: 'https://fcm.googleapis.com/fcm/send',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'key='+process.env.API_KEY
+      },
+      body: JSON.stringify({
+        "to": "/topics/user_"+username, // This is an aray of the users device tokens. Up to 1000 allowed by FCM
+        "priority": "high", // Change this value for different behavior on devices
+        "notification" : {
+          "body" : message,
+          "title": "Cleeq",
+          "sound": "default",
+          "badge": 0
+        }
+      })
+    },
+    function (error, response, body) {
+      if(response.statusCode == 200){
+
+        console.log('Success')
+
+        // Create a reference to the notification in the Firebase database
+        var notificationRef = db.ref("notifications/" + key);
+
+        // Set "sent" to true to avoid the notification being sent more than once
+        notificationRef.child("sent").set(true);
+
+        // Increment the "attempts"
+        notificationRef.child("attempts").set(attempts+1);
+      } else {
+        console.log('error: '+ response.statusCode)
+
+        // Create a reference to the notifications in the Firebase database
+        var notificationRef = db.ref("notifications/" + key);
+
+        // Increment the "attempts". Since "sent" is still false "child_changed" will be called
+        notificationRef.child("attempts").set(attempts+1);
+      }
+    }
+  )
+}
