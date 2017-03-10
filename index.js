@@ -1,9 +1,9 @@
 "use strict";
 const apn = require('apn');
-var key = require("./APNsAuthKey_49GQKEW5EP.p8");
+//var key = require("");
 let options = {
   token: {
-     key: key,
+     key: './APNsAuthKey_49GQKEW5EP.p8',
      // Replace keyID and teamID with the values you've previously saved.
      keyId: "49GQKEW5EP",
      teamId: "WCQEEPJWL6"
@@ -30,7 +30,7 @@ notification.topic = "com.cleeq.ios";
 // Send the actual notification
 apnProvider.send(notification, deviceToken).then( result => {
 // Show the result of the send operation:
-console.log(result);
+console.log("RESULT: ",result);
 });
  
  
