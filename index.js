@@ -1,63 +1,38 @@
-var gcm = require('node-gcm');
+"use strict";
+const apn = require('apn');
+var key = require("./APNsAuthKey_49GQKEW5EP.p8");
+let options = {
+  token: {
+     key: key,
+     // Replace keyID and teamID with the values you've previously saved.
+     keyId: "49GQKEW5EP",
+     teamId: "WCQEEPJWL6"
+   },
+   production: false
+ };
+ 
+let apnProvider = new apn.Provider(options);
 
-// Create a message
-// ... with default values
-//var message = new gcm.Message();
+// Replace deviceToken with your particular token:
+let deviceToken = "D4F2693A9D33E0D101BC3B86CB8A711713E96390D912E27E3A2F65A1F348BD2A";
 
-// ... or some given values
-var message = new gcm.Message({
-    collapseKey: 'demo',
-    priority: 'high',
-    contentAvailable: true,
-    delayWhileIdle: true,
-    timeToLive: 3,
-    restrictedPackageName: "somePackageName",
-    dryRun: true,
-    data: {
-        key1: 'message1',
-        key2: 'message2'
-    },
-    notification: {
-        title: "Hello, World",
-        icon: "ic_launcher",
-        body: "This is a notification that will be displayed if your app is in the background."
-    }
+// Prepare the notifications
+let notification = new apn.Notification();
+notification.expiry = Math.floor(Date.now() / 1000) + 24 * 3600; // will expire in 24 hours from now
+notification.badge = 2;
+notification.sound = "ping.aiff";
+notification.alert = "Hello from solarianprogrammer.com";
+notification.payload = {'messageFrom': 'Solarian Programmer'};
+
+// Replace this with your app bundle ID:
+notification.topic = "com.cleeq.ios";
+
+// Send the actual notification
+apnProvider.send(notification, deviceToken).then( result => {
+// Show the result of the send operation:
+console.log(result);
 });
-
-// Change the message data
-// ... as key-value
-/*message.addData('key1','message1');
-message.addData('key2','message2');
-
-// ... or as a data object (overwrites previous data object)
-message.addData({
-    key1: 'message1',
-    key2: 'message2'
-});*/
-
-// Set up the sender with you API key
-var sender = new gcm.Sender(process.env.API_KEY);
-
-// Add the registration tokens of the devices you want to send to
-var registrationTokens = [];
-registrationTokens.push('dV_32YFU43Y:APA91bG0PqFtbxj_xbBz9-8dVZIP43TMAj31MixzoFrZO4WiyCqfAEEVA0CWVmyVKRLum497_Ko_OYG95JkyIGPOodZLMN7TJOCk7SWUY3B8fdGb0Amt6FbUJtPo_13CNSSEbLpIQqek');
-registrationTokens.push('881b965a8a4d2b0d0b6bc61fa4fd32b2289cfe7c');
-
-// Send the message
-// ... trying only once
-sender.sendNoRetry(message, { registrationTokens: registrationTokens }, function(err, response) {
-  if(err) console.error(err);
-  else    console.log(response);
-});
-/*
-// ... or retrying
-sender.send(message, { registrationTokens: registrationTokens }, function (err, response) {
-  if(err) console.error(err);
-  else    console.log(response);
-});
-
-// ... or retrying a specific number of times (10)
-sender.send(message, { registrationTokens: registrationTokens }, 10, function (err, response) {
-  if(err) console.error(err);
-  else    console.log(response);
-});*/
+ 
+ 
+// Close the server
+apnProvider.shutdown();
