@@ -35,11 +35,8 @@ ref.orderByChild("sent").equalTo(false).on("child_changed", function(snapshot) {
 // This callback function is needed to detect additions to notification/ in the Firebase databse
 ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
   console.log("Snapshot recieved (child_added)",snapshot.val());
-  console.log(snapshot.val()["username"]);
-  console.log(snapshot.val()["message"]);
-  console.log(snapshot.val()["key"]);
-  console.log(snapshot.val()["attempts"]);
-sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot.val()["attempts"])
+  
+sendNotification(snapshot.val()["username"])//, snapshot.val()["message"], snapshot.val()["attempts"])
   //handleNotificationSnapshot(snapshot)
 });
 
@@ -78,7 +75,7 @@ sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot
 }*/
 
 // This is a function which sends notifications to multiple devices
-function sendNotification(username, message, attempts) {
+function sendNotification(username){//, message, attempts) {
 
   console.log("Sending notification");
 
@@ -91,10 +88,10 @@ function sendNotification(username, message, attempts) {
         'Authorization': 'key='+process.env.API_KEY
       },
       body: JSON.stringify({
-        "to": "/topics/user_"+username, // This is an aray of the users device tokens. Up to 1000 allowed by FCM
+        "to": "/topics/user_matt"//+username, // This is an aray of the users device tokens. Up to 1000 allowed by FCM
         "priority": "high", // Change this value for different behavior on devices
         "notification" : {
-          "body" : message,
+          "body" : "hi"//message,
           "title": "Cleeq",
           "sound": "default",
           "badge": 1
