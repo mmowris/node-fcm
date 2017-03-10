@@ -35,7 +35,7 @@ ref.orderByChild("sent").equalTo(false).on("child_changed", function(snapshot) {
 // This callback function is needed to detect additions to notification/ in the Firebase databse
 ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
   console.log("Snapshot recieved (child_added)"+snapshot.val());
-sendNotification(notificationSnapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
+sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
   //handleNotificationSnapshot(snapshot)
 });
 
