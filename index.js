@@ -83,7 +83,7 @@ function sendNotification(notificationID, message, key, attempts) {
       uri: 'https://fcm.googleapis.com/fcm/send',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'key=CLOUD MESSAGING SERVER KEY'
+        'Authorization': 'key='+process.env.API_KEY
       },
       body: JSON.stringify({
         "registration_ids": notificationID, // This is an aray of the users device tokens. Up to 1000 allowed by FCM
