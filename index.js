@@ -36,7 +36,7 @@ ref.orderByChild("sent").equalTo(false).on("child_changed", function(snapshot) {
 ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
   console.log("Snapshot recieved (child_added)");
 
-  handleNotificationSnapshot(snapshot)
+  //handleNotificationSnapshot(snapshot)
 });
 
 function handleNotificationSnapshot(snapshot) {
@@ -62,7 +62,7 @@ function handleNotificationSnapshot(snapshot) {
           console.log("Notification ids recieved");
 
           // Send the notification
-          sendNotification(notificationSnapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
+          //sendNotification(notificationSnapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
         }
         else {
           console.log("No notification ids registered");
