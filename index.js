@@ -49,6 +49,7 @@ function handleNotificationSnapshot(snapshot) {
     if (snapshot.val()["sent"] === false && snapshot.val()["attempts"] < 10) {
 
       console.log("VAL: ",snapshot.val());
+      console.log("username: ",snapshot.val()["username"]);
 
       // Create a reference to the notification ids (tokens) in the Firebase database
       var userNotificationIDRef = db.ref("notification_ids/" + snapshot.val()["username"]);
