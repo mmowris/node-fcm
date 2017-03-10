@@ -1,5 +1,6 @@
-var express = require('express');
-var app = express();
+var express = require('express'),
+	app = express(),
+	account = require('./key.json');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -12,8 +13,8 @@ var request = require('request');
 
 // Initialize the app with a service account, granting admin privileges
 firebase.initializeApp({
-  databaseURL: "My Firebase database URL",
-  serviceAccount: "MY SERVEICE ACCOUNT.json",
+  databaseURL: process.env.DB_URL,
+  serviceAccount: account,
 });
 
 console.log("Firebase initialization passed");
