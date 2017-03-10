@@ -39,7 +39,7 @@ ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
   console.log(snapshot.val()["message"]);
   console.log(snapshot.val()["key"]);
   console.log(snapshot.val()["attempts"]);
-sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
+sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot.val()["attempts"])
   //handleNotificationSnapshot(snapshot)
 });
 
@@ -78,7 +78,7 @@ sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot
 }*/
 
 // This is a function which sends notifications to multiple devices
-function sendNotification(username, message, key, attempts) {
+function sendNotification(username, message, attempts) {
 
   console.log("Sending notification");
 
@@ -107,21 +107,21 @@ function sendNotification(username, message, key, attempts) {
         console.log('Success')
 
         // Create a reference to the notification in the Firebase database
-        var notificationRef = db.ref("notifications/" + key);
+       // var notificationRef = db.ref("notifications/" + key);
 
         // Set "sent" to true to avoid the notification being sent more than once
-        notificationRef.child("sent").set(true);
+        //notificationRef.child("sent").set(true);
 
         // Increment the "attempts"
-        notificationRef.child("attempts").set(attempts+1);
+        //notificationRef.child("attempts").set(attempts+1);
       } else {
         console.log('error: '+ response.statusCode)
 
         // Create a reference to the notifications in the Firebase database
-        var notificationRef = db.ref("notifications/" + key);
+        //var notificationRef = db.ref("notifications/" + key);
 
         // Increment the "attempts". Since "sent" is still false "child_changed" will be called
-        notificationRef.child("attempts").set(attempts+1);
+        //notificationRef.child("attempts").set(attempts+1);
       }
     }
   )
