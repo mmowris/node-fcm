@@ -48,7 +48,7 @@ function handleNotificationSnapshot(snapshot) {
     // Double check that the notification has not been sent, and that the number of attemps is less than 10
     if (snapshot.val()["sent"] === false && snapshot.val()["attempts"] < 10) {
 
-      console.log("Muts get notification ids");
+      console.log("VAL: ",snapshot.val());
 
       // Create a reference to the notification ids (tokens) in the Firebase database
       var userNotificationIDRef = db.ref("notification_ids/" + snapshot.val()["recipientUID"]);
@@ -90,7 +90,7 @@ function sendNotification(notificationID, message, key, attempts) {
         "priority": "high", // Change this value for different behavior on devices
         "notification" : {
           "body" : message,
-          "title": "NAME OF APP",
+          "title": "Cleeq",
           "sound": "default",
           "badge": 0
         }
