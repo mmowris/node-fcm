@@ -27,19 +27,19 @@ var ref = db.ref("notifications");
 // Note that a proper exponential backoff algorithm would work much better,
 // but just trying to send the notification 10 times is decent for testing / beta launch
 ref.orderByChild("sent").equalTo(false).on("child_changed", function(snapshot) {
-  console.log("Snapshot recieved (child_changed)");
-
-  handleNotificationSnapshot(snapshot)
-});
-
-// This callback function is needed to detect additions to notification/ in the Firebase databse
-ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
-  console.log("Snapshot recieved (child_added)");
+  //console.log("Snapshot recieved (child_changed)");
 
   //handleNotificationSnapshot(snapshot)
 });
 
-function handleNotificationSnapshot(snapshot) {
+// This callback function is needed to detect additions to notification/ in the Firebase databse
+ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
+  console.log("Snapshot recieved (child_added)"+snapshot.val());
+sendNotification(notificationSnapshot.val()["username"], snapshot.val()["message"], snapshot.val()["key"], snapshot.val()["attempts"])
+  //handleNotificationSnapshot(snapshot)
+});
+
+/*function handleNotificationSnapshot(snapshot) {
   if (snapshot.val() != null) {   // Make sure that the snapshot is not empty
 
     // Log the number of send attemps
@@ -71,7 +71,7 @@ function handleNotificationSnapshot(snapshot) {
 
     }
   }
-}
+}*/
 
 // This is a function which sends notifications to multiple devices
 function sendNotification(username, message, key, attempts) {
