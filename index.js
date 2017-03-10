@@ -97,7 +97,7 @@ function sendNotification(username, message, attempts) {
           "body" : message,
           "title": "Cleeq",
           "sound": "default",
-          "badge": 0
+          "badge": 1
         }
       })
     },
