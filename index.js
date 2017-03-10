@@ -75,7 +75,7 @@ sendNotification(snapshot.val()["username"])//, snapshot.val()["message"], snaps
 }*/
 
 // This is a function which sends notifications to multiple devices
-function sendNotification(username){//, message, attempts) {
+function sendNotification(username) { //, message, attempts) {
 
   console.log("Sending notification");
 
@@ -88,7 +88,7 @@ function sendNotification(username){//, message, attempts) {
         'Authorization': 'key='+process.env.API_KEY
       },
       body: JSON.stringify({
-        "to": "/topics/user_matt"//+username, // This is an aray of the users device tokens. Up to 1000 allowed by FCM
+        "to": "/topics/user_matt",//+username, // This is an aray of the users device tokens. Up to 1000 allowed by FCM
         "priority": "high", // Change this value for different behavior on devices
         "notification" : {
           "body" : "hi"//message,
