@@ -36,10 +36,8 @@ ref.orderByChild("sent").equalTo(false).on("child_changed", function(snapshot) {
 ref.orderByChild("sent").equalTo(false).on("child_added", function(snapshot) {
   console.log("Snapshot recieved (child_added)",snapshot.val());
   console.log(snapshot.val()["username"]);
-  console.log(snapshot.val()["message"]);
-  console.log(snapshot.val()["key"]);
-  console.log(snapshot.val()["attempts"]);
-sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot.val()["attempts"])
+  console.log(snapshot.val()["type"]);
+sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot.val()["attempts"],snapshot.val()["type"])
   //handleNotificationSnapshot(snapshot)
 });
 
@@ -78,7 +76,7 @@ sendNotification(snapshot.val()["username"], snapshot.val()["message"], snapshot
 }*/
 
 // This is a function which sends notifications to multiple devices
-function sendNotification(username, message, attempts) {
+function sendNotification(username, message, attempts,type) {
 
   console.log("Sending notification");
 
@@ -98,6 +96,9 @@ function sendNotification(username, message, attempts) {
           "title": "Cleeq",
           "sound": "default",
           "badge": 1
+        },
+        "data" : {
+          "type" : type,
         }
       })
     },
